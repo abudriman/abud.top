@@ -38,12 +38,12 @@
             </div>
           </div>
           <div class="columns is-tablet">
-            <div v-show="$v.$dirty" class="column py-0">
+            <div v-show="$v.longURL.$dirty" class="column py-0">
               <div v-show="!$v.longURL.required" class="error">
                 <span class="has-text-danger has-background-white px-1"
                   >Error</span
                 >
-                Field is required
+                URL is required
               </div>
               <div v-show="!$v.longURL.url" class="error">
                 <span class="has-text-danger has-background-white px-1"
@@ -109,7 +109,7 @@
             <div class="column">
               <div class="index-raw-link">
                 <h2>
-                  {{ LongURL }}
+                  {{ longURL }}
                 </h2>
               </div>
             </div>
@@ -226,7 +226,7 @@
                   </div>
                 </div>
                 <div class="columns">
-                  <div class="column">
+                  <div class="column pb-0">
                     <div class="field">
                       <p class="control has-icons-left has-icons-right">
                         <input
@@ -239,6 +239,11 @@
                         </span>
                       </p>
                     </div>
+                  </div>
+                </div>
+                <div class="columns">
+                  <div class="column py-0">
+                    <p><span class="has-text-danger"> Error</span></p>
                   </div>
                 </div>
                 <div class="columns">
@@ -282,10 +287,15 @@
                   </div>
                 </div>
                 <div class="columns">
-                  <div class="column">
+                  <div class="column pb-0">
                     <div class="field">
                       <p class="control has-icons-left has-icons-right">
-                        <input class="input" type="email" placeholder="Email" />
+                        <input
+                          v-model.trim="$v.emailUp.$model"
+                          class="input"
+                          type="email"
+                          placeholder="Email"
+                        />
                         <span class="icon is-small is-left">
                           <b-icon icon="email" size="is-small" />
                         </span>
@@ -293,11 +303,26 @@
                     </div>
                   </div>
                 </div>
+                <div v-show="$v.emailUp.$dirty" class="columns">
+                  <div v-show="!$v.emailUp.required" class="column py-0">
+                    <p>
+                      <span class="has-text-danger px-1">Error</span> Email is
+                      required.
+                    </p>
+                  </div>
+                  <div v-show="!$v.emailUp.email" class="column py-0">
+                    <p>
+                      <span class="has-text-danger px-1">Error</span> Please
+                      enter a valid email address.
+                    </p>
+                  </div>
+                </div>
                 <div class="columns">
-                  <div class="column">
+                  <div class="column pb-0">
                     <div class="field">
                       <p class="control has-icons-left has-icons-right">
                         <input
+                          v-model.trim="$v.passwordUp.$model"
                           class="input"
                           type="password"
                           placeholder="Password"
@@ -309,20 +334,44 @@
                     </div>
                   </div>
                 </div>
+                <div v-show="$v.passwordUp.$dirty" class="columns">
+                  <div v-show="!$v.passwordUp.required" class="column py-0">
+                    <p>
+                      <span class="has-text-danger px-1">Error</span> Password
+                      is required.
+                    </p>
+                  </div>
+                  <div v-show="!$v.passwordUp.minLength" class="column py-0">
+                    <p>
+                      <span class="has-text-danger px-1">Error</span> Password
+                      must have at least
+                      {{ $v.passwordUp.$params.minLength.min }} character.
+                    </p>
+                  </div>
+                </div>
                 <div class="columns">
-                  <div class="column">
+                  <div class="column pb-0">
                     <div class="field">
                       <p class="control has-icons-left has-icons-right">
                         <input
                           class="input"
                           type="password"
                           placeholder="Confirm Password"
+                          @input="checkPassword($event.target.value)"
                         />
                         <span class="icon is-small is-left">
                           <b-icon icon="lock" size="is-small" />
                         </span>
                       </p>
                     </div>
+                  </div>
+                </div>
+                <div v-if="!passwordConfirmed && dirty" class="columns">
+                  <div class="column py-0">
+                    <p>
+                      <span class="has-text-danger px-1">Error</span> Password
+                      does not match.
+                    </p>
                   </div>
                 </div>
                 <div class="columns">
@@ -380,7 +429,7 @@
 </template>
 
 <script>
-import { required, url } from 'vuelidate/lib/validators'
+import { required, url, email, minLength } from 'vuelidate/lib/validators'
 import ShortUniqueId from 'short-unique-id'
 const html = document.querySelector('html')
 const uid = new ShortUniqueId()
@@ -395,12 +444,26 @@ export default {
       uuid: '',
       showResult: false,
       authenticated: false,
+      emailUp: '',
+      passwordUp: '',
+      passwordConfirmed: false,
+      dirty: false,
+      emailIn: '',
+      passwordIn: '',
     }
   },
   validations: {
     longURL: {
       required,
       url,
+    },
+    emailUp: {
+      required,
+      email,
+    },
+    passwordUp: {
+      required,
+      minLength: minLength(8),
     },
   },
   head() {
@@ -438,6 +501,24 @@ export default {
     toggleModalMode() {
       this.isSignIn = !this.isSignIn
     },
+    checkPassword(value) {
+      this.dirty = true
+      if (value === this.passwordUp) {
+        this.passwordConfirmed = true
+      } else {
+        this.passwordConfirmed = false
+      }
+    },
+    // async createUser() {
+    //   try {
+    //     await this.$fire.auth.createUserWithEmailAndPassword(
+    //       'foo@foo.foo',
+    //       'test'
+    //     )
+    //   } catch (e) {
+    //     handleError(e)
+    //   }
+    // },
   },
 }
 </script>
