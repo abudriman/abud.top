@@ -20,7 +20,7 @@ export default {
   css: ['@/assets/css/global.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: ['~/plugins/vuelidate.js'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -41,6 +41,24 @@ export default {
     // https://go.nuxtjs.dev/content
     '@nuxt/content',
     '@nuxtjs/svg',
+    [
+      '@nuxtjs/firebase',
+      {
+        config: {
+          apiKey: 'AIzaSyAxVawLyI3XmL_jN4JphuJPnjKURpAZEv8',
+          authDomain: 'encourage-abud-top.firebaseapp.com',
+          projectId: 'encourage-abud-top',
+          storageBucket: 'encourage-abud-top.appspot.com',
+          messagingSenderId: '952781335021',
+          appId: '1:952781335021:web:35492ecbf40875311f1fe4',
+          measurementId: 'G-61WRHCMSK5',
+        },
+        services: {
+          auth: true,
+          firestore: true,
+        },
+      },
+    ],
   ],
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa

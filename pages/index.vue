@@ -25,8 +25,11 @@
           <div class="columns is-tablet">
             <div class="column">
               <input
+                v-model.trim="$v.longURL.$model"
                 class="input"
                 type="text"
+                name="longURL"
+                autocomplete="off"
                 placeholder="Place your URL here"
               />
             </div>
@@ -34,10 +37,27 @@
               <button class="button is-fullwidth is-link">Shorten</button>
             </div>
           </div>
+          <div class="columns is-tablet">
+            <div v-show="$v.$dirty" class="column py-0">
+              <div v-show="!$v.longURL.required" class="error">
+                <span class="has-text-danger has-background-white px-1"
+                  >Error</span
+                >
+                Field is required
+              </div>
+              <div v-show="!$v.longURL.url" class="error">
+                <span class="has-text-danger has-background-white px-1"
+                  >Error</span
+                >
+                Please enter valid URL address and make sure it starts with
+                http:// or https://
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
-    <section id="result" class="section result">
+    <section v-show="showResult" id="result" class="section result">
       <div class="container">
         <div class="columns">
           <div class="column is-fullwidth index-result-close">
@@ -51,7 +71,7 @@
             <div class="notification is-link is-light">
               <div class="columns is-vcentered">
                 <div class="column index-short-link">
-                  https://abud.top/skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8skdfja8
+                  {{ shortURL }}
                   <span>
                     <a @click.prevent="editShortURL"
                       ><b-icon
@@ -72,7 +92,7 @@
         <div class="columns on-edit">
           <div class="column py-0">
             <p class="is-size-6">
-              <span class="has-text-danger">Error:</span> link already exist,
+              <span class="has-text-danger">Error:</span> URL already exist,
               please try another one.
             </p>
           </div>
@@ -89,7 +109,7 @@
             <div class="column">
               <div class="index-raw-link">
                 <h2>
-                  https://drive.google.com/file/d/13GjyoSbb_qPZVMjGTePS5gOoaYDjsq4C/viewhttps://drive.google.com/file/d/13GjyoSbb_qPZVMjGTePS5gOoaYDjsq4C/viewhttps://drive.google.com/file/d/13GjyoSbb_qPZVMjGTePS5gOoaYDjsq4C/viewhttps://drive.google.com/file/d/13GjyoSbb_qPZVMjGTePS5gOoaYDjsq4C/viewhttps://drive.google.com/file/d/13GjyoSbb_qPZVMjGTePS5gOoaYDjsq4C/viewhttps://drive.google.com/file/d/13GjyoSbb_qPZVMjGTePS5gOoaYDjsq4C/view
+                  {{ LongURL }}
                 </h2>
               </div>
             </div>
@@ -100,7 +120,7 @@
 
     <section class="section has-background-dark">
       <div class="container">
-        <div class="columns is-centered">
+        <div v-if="authenticated" class="columns is-centered">
           <div class="column is-half has-text-centered">
             <div class="is-block">
               <p class="title is-1 has-text-white">Your History</p>
@@ -108,6 +128,18 @@
             <div class="is-block">
               <p class="subtitle is-7 has-text-white">
                 These URL list is private, not shown on public history
+              </p>
+            </div>
+          </div>
+        </div>
+        <div v-else class="columns is-centered">
+          <div class="column is-half has-text-centered">
+            <div class="is-block">
+              <p class="title is-1 has-text-white">Public History</p>
+            </div>
+            <div class="is-block">
+              <p class="subtitle is-7 has-text-white">
+                Log in to see your private url list.
               </p>
             </div>
           </div>
@@ -150,7 +182,7 @@
             </p>
           </div>
         </div>
-        <div class="columns is-centered">
+        <div v-if="authenticated" class="columns is-centered">
           <div class="column is-half has-text-centered">
             <button class="button is-primary">Switch to public history</button>
           </div>
@@ -174,11 +206,11 @@
                   </div>
                 </div>
                 <div class="columns">
-                  <div
-                    class="column is-flex is-flex-direction-row is-justify-content-space-between is-align-items-flex-end"
-                  >
+                  <div class="column is-flex is-flex-direction-column">
                     <h3 class="title is-3">Sign in</h3>
-                    <a @click="toggleModalMode">Create an account instead?</a>
+                    <a class="is-align-self-flex-end" @click="toggleModalMode"
+                      >Create an account instead?</a
+                    >
                   </div>
                 </div>
                 <div class="columns">
@@ -210,6 +242,11 @@
                   </div>
                 </div>
                 <div class="columns">
+                  <div class="column py-0">
+                    <a class="">Forgot your password?</a>
+                  </div>
+                </div>
+                <div class="columns">
                   <div class="column">
                     <button class="button is-primary is-fullwidth">
                       Sign in
@@ -237,11 +274,11 @@
             <div v-else class="columns is-centered">
               <div class="column is-one-third has-background-white">
                 <div class="columns">
-                  <div
-                    class="column is-flex is-flex-direction-row is-justify-content-space-between is-align-items-flex-end"
-                  >
+                  <div class="column is-flex is-flex-direction-column">
                     <h3 class="title is-3">Sign Up</h3>
-                    <a @click="toggleModalMode">Already have an account?</a>
+                    <a class="is-align-self-flex-end" @click="toggleModalMode"
+                      >Already have an account?</a
+                    >
                   </div>
                 </div>
                 <div class="columns">
@@ -330,24 +367,60 @@
           <b-icon icon="link-variant" size="is-small" type="is-link" />. Visit
           my online journal to see my other works.
         </p>
+        <div class="is-flex is-justify-content-center pt-3">
+          <img
+            src="~/assets/image/made-with-bulma.png"
+            class="bulma-badge"
+            width="200px"
+          />
+        </div>
       </div>
     </footer>
   </div>
 </template>
 
 <script>
+import { required, url } from 'vuelidate/lib/validators'
+import ShortUniqueId from 'short-unique-id'
+const html = document.querySelector('html')
+const uid = new ShortUniqueId()
 export default {
   name: 'HomePage',
   data() {
     return {
-      isModalOpen: true,
+      isModalOpen: false,
       isSignIn: true,
+      longURL: '',
+      shortURL: '',
+      uuid: '',
+      showResult: false,
+      authenticated: false,
+    }
+  },
+  validations: {
+    longURL: {
+      required,
+      url,
+    },
+  },
+  head() {
+    return {
+      title: 'abud.top | URL Shortener by Arif Budiman',
+      meta: [
+        // hid is used as unique identifier. Do not use `vmid` for it as it will not work
+        {
+          hid: 'abud.top',
+          name: 'abud.top',
+          content: 'URL Shortener by Arif Budiman',
+        },
+      ],
     }
   },
   created() {
     this.$nuxt.$on('open-modal', (value) => {
       this.toggleModalSignIn(value)
     })
+    this.uuid = uid()
   },
   methods: {
     editShortURL() {
@@ -355,6 +428,7 @@ export default {
     },
     toggleModalSignIn(mode) {
       this.isModalOpen = !this.isModalOpen
+      html.classList.toggle('is-clipped')
       if (mode) {
         this.isSignIn = true
       } else {
@@ -383,9 +457,6 @@ export default {
 .index-td {
   word-wrap: break-word;
   word-break: break-all;
-}
-.result {
-  /* display: none; */
 }
 .index-result-close {
   display: flex;
