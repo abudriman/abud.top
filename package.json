@@ -17,7 +17,7 @@
     "@nuxtjs/pwa": "^3.3.5",
     "core-js": "^3.9.1",
     "firebase": "^8.2.10",
-    "nuxt": "^2.14.12",
+    "nuxt": "^2.15.3",
     "nuxt-buefy": "^0.4.4",
     "short-unique-id": "^3.2.3",
     "vuelidate": "^0.7.6"
