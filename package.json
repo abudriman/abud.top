@@ -20,7 +20,7 @@
     "core-js": "^3.10.0",
     "nuxt": "^2.15.4",
     "nuxt-buefy": "^0.4.5",
-    "short-unique-id": "^3.2.3",
+    "short-unique-id": "^4.3.3",
     "vuelidate": "^0.7.6"
   },
   "devDependencies": {
